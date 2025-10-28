@@ -31,9 +31,9 @@ class AuthController extends Controller
         $user->makeHidden(['password', 'remember_token']);
 
         return response()->json([
-            'code'  =>  Response::HTTP_CREATED,
-            'status'=>  Response::$statusTexts[Response::HTTP_CREATED],
-            'data'  =>  $user
+            'code'   =>  Response::HTTP_CREATED,
+            'status' =>  Response::$statusTexts[Response::HTTP_CREATED],
+            'data'   =>  $user
         ], Response::HTTP_CREATED);
     }
 
@@ -44,14 +44,18 @@ class AuthController extends Controller
     public function login(LoginRequest $request){
         if (Auth::attempt($request->validated())) {
 
-            // Prefer Auth::user() after successful attempt
-            $user = Auth::user();
-            $expires = now()->addWeek();
-            $accessToken = $user->createToken('access-token', ['*'], $expires)->plainTextToken;
+            $user        = Auth::user();
+            $expires     = now()->addWeek();
+            $newToken    = $user->createToken('access-token', ['*'], $expires);
+
+            $plainTextToken = $newToken->plainTextToken;
+            $tokenData = $newToken->accessToken;
 
             $token = new Fluent([
-                'access_token'  =>  $accessToken,
+                'access_token'  =>  $plainTextToken,
+                'token_type'    =>  'Bearer',
                 'expired_at'    =>  $expires->timestamp,
+                'expires_date'  =>  $expires->toDateTime(),
             ]);
 
             return response()->json([
