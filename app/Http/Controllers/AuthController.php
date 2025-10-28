@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Fluent;
@@ -69,7 +70,7 @@ class AuthController extends Controller
     /**
      * Get current user
      */
-    public function user($request) {
+    public function user(Request $request) {
         $user = $request->user();
 
         return response()->json([
@@ -83,7 +84,7 @@ class AuthController extends Controller
      * Logout user and revoke tokens
      */
 
-    public function logout($request) {
+    public function logout(Request $request) {
         $request->user()->currentAccessToken()->delete();
         return response()->json([
             'code'      =>  Response::HTTP_OK,
